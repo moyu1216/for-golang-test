@@ -1,5 +1,7 @@
 FROM ubuntu:20.04
 
+RUN userdel -r node && useradd -m -u 1000 -s /bin/bash faas
+
 COPY main /opt/application/main
 COPY run.sh /opt/application/run.sh
 
