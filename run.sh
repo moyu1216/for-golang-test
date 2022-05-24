@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-./main
+
+cd /opt/application/ && ./main
