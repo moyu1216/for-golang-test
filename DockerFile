@@ -1,4 +1,4 @@
-FROM golang
+FROM ubuntu:20.04
 
 COPY main /opt/application/main
 COPY run.sh /opt/application/run.sh
