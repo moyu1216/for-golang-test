@@ -19,10 +19,15 @@ func headers(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func ping(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "pong!\n")
+}
+
 func main() {
 
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
+	http.HandleFunc("/v1/ping", ping)
 
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(":8000", nil)
 }
