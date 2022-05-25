@@ -7,4 +7,4 @@ COPY run.sh /opt/application/run.sh
 
 WORKDIR /opt/application
 USER root
-CMD /opt/application/run.sh
+# CMD /opt/application/run.sh
