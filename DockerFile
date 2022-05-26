@@ -21,6 +21,7 @@ RUN GOOS=linux go build -o main .
 
 #FROM alpine:3.13
 FROM ubuntu:20.04
+RUN useradd -m -u 1000 -s /bin/bash faas
 WORKDIR /opt/application
 COPY --from=builder /app/main /app/run.sh /opt/application
 USER root
