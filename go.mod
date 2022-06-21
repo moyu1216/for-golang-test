@@ -1,3 +1,5 @@
 module github.com/Ccc-me/for-golang-test
 
 go 1.16
+
+require github.com/volcengine/vefaas-golang-runtime v0.0.0-20220324111123-998a3428ddcb
