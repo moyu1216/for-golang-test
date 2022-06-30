@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/volcengine/vefaas-golang-runtime/events"
 	"github.com/volcengine/vefaas-golang-runtime/vefaas"
@@ -34,6 +35,7 @@ func handler(ctx context.Context, r *events.HTTPRequest) (*events.EventResponse,
 	ret["http_query"] = query
 	ret["http_header"] = header
 	ret["http_body"] = string(r.Body)
+	ret["now_time"] = time.Now().Format(time.RFC3339)
 	retBody, _ := json.Marshal(ret)
 	return &events.EventResponse{
 		Headers: map[string]string{
