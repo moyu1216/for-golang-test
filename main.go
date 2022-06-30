@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func hello(w http.ResponseWriter, req *http.Request) {
@@ -17,6 +18,7 @@ func headers(w http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(w, "%v: %v\n", name, h)
 		}
 	}
+	fmt.Fprintf(w, "NowTime: %s", time.Now().Format(time.RFC3339))
 }
 
 func ping(w http.ResponseWriter, req *http.Request) {
