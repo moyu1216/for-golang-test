@@ -22,7 +22,7 @@ func headers(w http.ResponseWriter, req *http.Request) {
 }
 
 func ping(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "pong!\n")
+	fmt.Fprintf(w, "NowTime: %s\n", time.Now().Format(time.RFC3339))
 }
 
 func main() {
