@@ -18,11 +18,11 @@ func headers(w http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(w, "%v: %v\n", name, h)
 		}
 	}
-	fmt.Fprintf(w, "NowTime: %s", time.Now().Format(time.RFC3339))
+	fmt.Fprintf(w, "NowTime: %s", time.Now().Format("2006-01-02 15:04:05"))
 }
 
 func ping(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "NowTime: %s\n", time.Now().Format(time.RFC3339))
+	fmt.Fprintf(w, "NowTime: %s\n", time.Now().Format("2006-01-02 15:04:05"))
 }
 
 func main() {
