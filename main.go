@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -22,6 +23,7 @@ func headers(w http.ResponseWriter, req *http.Request) {
 }
 
 func ping(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "TZ:%s", os.Getenv("TZ"))
 	fmt.Fprintf(w, "NowTime: %s\n", time.Now().Format("2006-01-02 15:04:05"))
 }
 
