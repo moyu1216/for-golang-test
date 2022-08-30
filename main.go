@@ -28,10 +28,13 @@ func ping(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	if os.Getenv("flag") != "success" {
+		panic("this is no flag env")
+	}
 
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
 	http.HandleFunc("/v1/ping", ping)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8000", nil)
 }
