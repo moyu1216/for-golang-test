@@ -33,5 +33,5 @@ func main() {
 	http.HandleFunc("/headers", headers)
 	http.HandleFunc("/v1/ping", ping)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8000", nil)
 }
