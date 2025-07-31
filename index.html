@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能旅行规划器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response-section {
+            margin-top: 30px;
+        }
+
+        .plan-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .plan-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .plan-steps {
+            list-style: none;
+        }
+
+        .plan-steps li {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .response-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #363;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .streaming-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 智能旅行规划器</h1>
+            <p>基于 Plan and Execute 框架的专业旅行规划服务</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="query">请描述您的旅行需求：</label>
+                    <textarea 
+                        id="query" 
+                        placeholder="例如：我想去日本东京旅行5天，预算5000元，想体验当地美食和文化..."
+                    ></textarea>
+                </div>
+
+                <div class="options">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="streaming">
+                        <label for="streaming">启用流式输出</label>
+                    </div>
+                    <button onclick="submitQuery()" id="submitBtn">开始规划</button>
+                </div>
+            </div>
+
+            <div class="response-section hidden" id="responseSection">
+                <div class="plan-section hidden" id="planSection">
+                    <h3>📋 旅行计划</h3>
+                    <ul class="plan-steps" id="planSteps"></ul>
+                </div>
+
+                <div class="response-content hidden" id="responseContent"></div>
+
+                <div class="loading hidden" id="loading">
+                    <div class="streaming-indicator"></div>
+                    正在为您规划旅行...
+                </div>
+
+                <div class="error hidden" id="error"></div>
+                <div class="success hidden" id="success"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+
+        function showSection(sectionId) {
+            document.getElementById('responseSection').classList.remove('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function hideSection(sectionId) {
+            document.getElementById(sectionId).classList.add('hidden');
+        }
+
+        function clearResponse() {
+            hideSection('planSection');
+            hideSection('responseContent');
+            hideSection('loading');
+            hideSection('error');
+            hideSection('success');
+        }
+
+        function showError(message) {
+            clearResponse();
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            showSection('error');
+        }
+
+        function showSuccess(message) {
+            clearResponse();
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            showSection('success');
+        }
+
+        function submitQuery() {
+            const query = document.getElementById('query').value.trim();
+            const streaming = document.getElementById('streaming').checked;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!query) {
+                showError('请输入旅行需求');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            clearResponse();
+
+            if (streaming) {
+                submitStreamingQuery(query);
+            } else {
+                submitNormalQuery(query);
+            }
+        }
+
+        function submitNormalQuery(query) {
+            showSection('loading');
+            
+            fetch('/travel/plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    streaming: false
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideSection('loading');
+                
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    // 显示计划
+                    if (data.plan && data.plan.steps) {
+                        const planSteps = document.getElementById('planSteps');
+                        planSteps.innerHTML = '';
+                        data.plan.steps.forEach(step => {
+                            const li = document.createElement('li');
+                            li.textContent = step;
+                            planSteps.appendChild(li);
+                        });
+                        showSection('planSection');
+                    }
+
+                    // 显示响应
+                    if (data.response) {
+                        const responseContent = document.getElementById('responseContent');
+                        responseContent.textContent = data.response;
+                        showSection('responseContent');
+                    }
+                }
+            })
+            .catch(error => {
+                hideSection('loading');
+                showError('请求失败: ' + error.message);
+            })
+            .finally(() => {
+                document.getElementById('submitBtn').disabled = false;
+            });
+        }
+
+        function submitStreamingQuery(query) {
+            showSection('loading');
+            
+            // 创建WebSocket连接
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/travel/plan`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                ws.send(JSON.stringify({
+                    query: query,
+                    streaming: true
+                }));
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.error) {
+                    hideSection('loading');
+                    showError(data.error);
+                    ws.close();
+                    return;
+                }
+
+                // 显示计划
+                if (data.plan && data.plan.steps) {
+                    const planSteps = document.getElementById('planSteps');
+                    planSteps.innerHTML = '';
+                    data.plan.steps.forEach(step => {
+                        const li = document.createElement('li');
+                        li.textContent = step;
+                        planSteps.appendChild(li);
+                    });
+                    showSection('planSection');
+                }
+
+                // 处理流式响应
+                if (data.response !== undefined) {
+                    hideSection('loading');
+                    const responseContent = document.getElementById('responseContent');
+                    
+                    if (!responseContent.textContent) {
+                        responseContent.textContent = '';
+                    }
+                    
+                    responseContent.textContent += data.response;
+                    showSection('responseContent');
+                }
+
+                // 检查是否完成
+                if (data.completed) {
+                    ws.close();
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            };
+
+            ws.onerror = function(error) {
+                hideSection('loading');
+                showError('WebSocket连接失败');
+                document.getElementById('submitBtn').disabled = false;
+            };
+
+            ws.onclose = function() {
+                document.getElementById('submitBtn').disabled = false;
+            };
+        }
+
+        // 页面卸载时关闭WebSocket连接
+        window.addEventListener('beforeunload', function() {
+            if (ws) {
+                ws.close();
+            }
+        });
+    </script>
+</body>
+</html>
