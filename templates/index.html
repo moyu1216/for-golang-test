@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 6px;
+        }
+
+        .message-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            font-size: 16px;
+        }
+
+        .message.user .message-icon {
+            background: #007bff;
+            color: white;
+        }
+
+        .message.assistant .message-icon {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #4CAF50;
+        }
+
+        .send-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #45a049;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #ff5252;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .examples {
+            margin: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .examples h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .example-item {
+            display: inline-block;
+            background: white;
+            padding: 8px 12px;
+            margin: 4px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid #4CAF50;
+            color: #2e7d32;
+        }
+
+        .example-item:hover {
+            transform: translateY(-2px);
+            background: #4CAF50;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎒 旅游智能助手</h1>
+            <p>为您规划完美的旅程，提供个性化的旅游建议</p>
+        </div>
+
+        <div class="examples">
+            <h3>💡 试试这些问题：</h3>
+            <span class="example-item" onclick="setInput('北京的天气怎么样？')">🌤️ 查询天气</span>
+            <span class="example-item" onclick="setInput('推荐上海的景点')">🏛️ 景点推荐</span>
+            <span class="example-item" onclick="setInput('广州有什么好吃的？')">🍜 美食推荐</span>
+            <span class="example-item" onclick="setInput('帮我规划北京一日游')">🗺️ 行程规划</span>
+            <span class="example-item" onclick="setInput('上海有什么好酒店？')">🏨 酒店推荐</span>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message assistant">
+                <div class="message-icon">🤖</div>
+                <div class="message-content">
+                    👋 您好！我是您的专属旅游助手！
+                    
+我可以帮您：
+• 🌤️ 查询天气信息
+• 🏛️ 推荐热门景点
+• 🍜 推荐当地美食
+• 🏨 搜索酒店住宿
+• 🗺️ 规划旅游路线
+
+请告诉我您想去哪里旅游，或者有什么旅游相关的问题～
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            🤖 助手正在思考中...
+        </div>
+
+        <div class="input-container">
+            <div class="input-group">
+                <input type="text" id="messageInput" class="input-field" 
+                       placeholder="输入您的旅游问题..." 
+                       onkeypress="handleKeyPress(event)">
+                <button onclick="clearChat()" class="clear-btn">清空</button>
+                <button onclick="sendMessage()" class="send-btn" id="sendBtn">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setInput(text) {
+            document.getElementById('messageInput').value = text;
+            document.getElementById('messageInput').focus();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(content, isUser) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const icon = isUser ? '👤' : '🤖';
+            messageDiv.innerHTML = `
+                <div class="message-icon">${icon}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const loading = document.getElementById('loading');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addMessage(message, true);
+            input.value = '';
+            
+            // 显示加载状态
+            sendBtn.disabled = true;
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`❌ 错误: ${data.error}`, false);
+                }
+            } catch (error) {
+                addMessage(`❌ 网络错误: ${error.message}`, false);
+            } finally {
+                sendBtn.disabled = false;
+                loading.style.display = 'none';
+                input.focus();
+            }
+        }
+
+        async function clearChat() {
+            try {
+                await fetch('/api/clear', { method: 'POST' });
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.innerHTML = `
+                    <div class="message assistant">
+                        <div class="message-icon">🤖</div>
+                        <div class="message-content">
+                            ✨ 对话已清空！我是您的旅游助手，有什么可以帮您的吗？
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('清空对话失败:', error);
+            }
+        }
+
+        // 页面加载完成时聚焦输入框
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('messageInput').focus();
+        });
+    </script>
+</body>
+</html>
