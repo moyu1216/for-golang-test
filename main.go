@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 )
 
 func hello(w http.ResponseWriter, req *http.Request) {
-
-	fmt.Fprintf(w, "hello\n")
+	fmt.Fprintf(w, "Hello, World! 🌍\n")
+	fmt.Fprintf(w, "欢迎使用Go语言HTTP服务器！\n")
+	fmt.Fprintf(w, "当前时间: %s\n", time.Now().Format("2006-01-02 15:04:05"))
 }
 
 func headers(w http.ResponseWriter, req *http.Request) {
