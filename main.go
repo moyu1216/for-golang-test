@@ -37,6 +37,9 @@ func ping(w http.ResponseWriter, req *http.Request) {
 
 // main函数：程序入口，设置路由并启动HTTP服务器
 func main() {
+	// 输出Hello World消息
+	fmt.Println("Hello, World!")
+
 	// 注册路由处理函数
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
